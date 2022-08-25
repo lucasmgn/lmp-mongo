@@ -21,4 +21,9 @@ public class Aluno {
 	private Curso curso;
 	private List<Habilidade> habilidades;
 	
+	public Aluno criarId() {
+		setId(new ObjectId());
+		return this;
+	}
+	
 }
