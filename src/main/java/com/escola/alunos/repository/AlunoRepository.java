@@ -30,7 +30,13 @@ public class AlunoRepository {
 
 		criarCodec();
 		MongoCollection<Aluno> alunos = this.bancoDeDados.getCollection("alunos", Aluno.class);
-		alunos.insertOne(aluno);
+		
+		if(aluno.getId() == null) {
+			alunos.insertOne(aluno);
+		}else {
+			alunos.updateOne(Filters.eq("_id", aluno.getId()), new Document("$set", aluno));
+		}
+		
 
 		cliente.close();
 	}
@@ -56,14 +62,15 @@ public class AlunoRepository {
 	// Buscando aluno por id
 	public Aluno obterAlunoId(String id) {
 		criarCodec();
+		//Utilizando a coleção alunos
 		MongoCollection<Aluno> alunos = this.bancoDeDados.getCollection("alunos", Aluno.class);
 		Aluno alunoId = alunos.find(Filters.eq("_id", new ObjectId(id))).first();
 
 		return alunoId;
 	}
 
+	// Registrando um codec, conexão
 	private void criarCodec() {
-		// Registrando um codec
 		Codec<Document> codec = MongoClientSettings.getDefaultCodecRegistry().get(Document.class);
 
 		AlunoCodec alunoCodec = new AlunoCodec(codec);

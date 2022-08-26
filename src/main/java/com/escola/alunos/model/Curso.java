@@ -7,11 +7,11 @@ import lombok.Setter;
 @Setter
 public class Curso {
 	
+	private String nome;
+	
 	public Curso() {}
 	
 	public Curso(String nome) {
 		this.nome = nome;
 	}
-
-	private String nome;
 }

@@ -9,28 +9,27 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import com.escola.alunos.model.Aluno;
-import com.escola.alunos.model.Habilidade;
+import com.escola.alunos.model.Nota;
 import com.escola.alunos.repository.AlunoRepository;
 
 @Controller
-public class HabilidadeController {
+public class NotaController {
 
 	@Autowired
-	private AlunoRepository repository;
-
-	@GetMapping("/habilidades/cadastrarHabilidade/{id}")
+	private AlunoRepository repository;		
+	
+	@GetMapping("nota/cadastrarNota/{id}")
 	public String cadastrar(@PathVariable String id, Model model) {
-		Aluno aluno = repository.obterAlunoId(id);
-		model.addAttribute("aluno", aluno);
-		model.addAttribute("habilidade", new Habilidade());
-		return "habilidades/cadastrarHabilidade";
+		 Aluno aluno = repository.obterAlunoId(id);
+		 model.addAttribute("aluno", aluno);
+		 model.addAttribute("notas", new Nota());
+		return "nota/cadastrarNota";
 	}
 	
-	//Salvando nova habilidade de um aluno
-	@PostMapping("/habilidades/salvar/{id}")
-	public String salvar(@PathVariable String id, @ModelAttribute Habilidade habilidade) {
-		Aluno aluno = repository.obterAlunoId(id);
-		repository.salvar(aluno.adicionarHabilidade(aluno, habilidade)); 
+	@PostMapping("nota/salvar/{id}")
+	public String salvar(@PathVariable String id, @ModelAttribute Nota nota) {
+		 Aluno aluno = repository.obterAlunoId(id);
+		 repository.salvar(aluno.adicionarNota(aluno, nota)); 
 		return "redirect:/aluno/listar";
 	}
 }
