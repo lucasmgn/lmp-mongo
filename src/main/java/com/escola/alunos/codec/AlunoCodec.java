@@ -49,6 +49,7 @@ public class AlunoCodec implements CollectibleCodec<Aluno> {
 				habilidadesDocument.add(new Document("nome", habilidade.getNome())
 						.append("nível", habilidade.getNivel()));
 			}
+			//document no bd
 			document.put("habilidades", habilidadesDocument);
 		}
 		
