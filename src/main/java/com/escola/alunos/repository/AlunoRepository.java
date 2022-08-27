@@ -30,15 +30,14 @@ public class AlunoRepository {
 
 		criarCodec();
 		MongoCollection<Aluno> alunos = this.bancoDeDados.getCollection("alunos", Aluno.class);
-		
-		if(aluno.getId() == null) {
+
+		if (aluno.getId() == null) {
 			alunos.insertOne(aluno);
-		}else {
+		} else {
 			alunos.updateOne(Filters.eq("_id", aluno.getId()), new Document("$set", aluno));
 		}
-		
 
-		cliente.close();
+		fecharConexao();
 	}
 
 	public List<Aluno> obterTodosAlunos() {
@@ -47,14 +46,14 @@ public class AlunoRepository {
 		MongoCollection<Aluno> alunos = this.bancoDeDados.getCollection("alunos", Aluno.class);
 		MongoCursor<Aluno> iterator = alunos.find().iterator();
 
-		List<Aluno> alunosEncontrados = new ArrayList<>();
+		List<Aluno> alunosEncontrados = popularAlunos(iterator);
 
 		// Criando uma interação enquanto achar resultados
 		while (iterator.hasNext()) {
 			Aluno aluno = iterator.next();
 			alunosEncontrados.add(aluno);
 		}
-		cliente.close();
+		fecharConexao();
 
 		return alunosEncontrados;
 	}
@@ -62,11 +61,27 @@ public class AlunoRepository {
 	// Buscando aluno por id
 	public Aluno obterAlunoId(String id) {
 		criarCodec();
-		//Utilizando a coleção alunos
+		// Utilizando a coleção alunos
 		MongoCollection<Aluno> alunos = this.bancoDeDados.getCollection("alunos", Aluno.class);
 		Aluno alunoId = alunos.find(Filters.eq("_id", new ObjectId(id))).first();
 
+		fecharConexao();
 		return alunoId;
+	}
+	
+	public List<Aluno> obterAlunoNome(String nome) {
+		criarCodec();
+		// Utilizando a coleção alunos
+		MongoCollection<Aluno> alunoCollection = this.bancoDeDados.getCollection("alunos", Aluno.class);
+		MongoCursor<Aluno> resultados = alunoCollection.find(Filters.eq("nome", nome), Aluno.class).iterator();
+		List<Aluno> alunos = popularAlunos(resultados);
+		
+		fecharConexao();
+		return alunos;
+	}
+
+	private void fecharConexao() {
+		this.cliente.close();
 	}
 
 	// Registrando um codec, conexão
@@ -82,5 +97,13 @@ public class AlunoRepository {
 		this.cliente = MongoClients.create(build);
 		// Se o DB não existirm ele cria um com o nome definido
 		this.bancoDeDados = cliente.getDatabase("escola-LMP");
+	}
+	
+	private List<Aluno> popularAlunos(MongoCursor<Aluno> resultados){
+		List<Aluno> alunos = new ArrayList<>();
+		while(resultados.hasNext()) {
+			alunos.add(resultados.next());
+		}
+		return alunos;
 	}
 }

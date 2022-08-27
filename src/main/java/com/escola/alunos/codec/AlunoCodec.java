@@ -84,6 +84,7 @@ public class AlunoCodec implements CollectibleCodec<Aluno> {
 			aluno.setCurso(new Curso(nomeCurso));
 		}
 		
+		@SuppressWarnings("unchecked")
 		List<Double> notas = (List<Double>) document.get("notas");
 		if(notas != null) {
 			List<Nota> notasAluno = new ArrayList<>();
@@ -93,6 +94,7 @@ public class AlunoCodec implements CollectibleCodec<Aluno> {
 			aluno.setNotas(notasAluno);
 		}
 		
+		@SuppressWarnings("unchecked")
 		List<Document> habilidades = (List<Document>) document.get("habilidades");
 		if(habilidades != null) {
 			List<Habilidade> habilidadesAluno = new ArrayList<>();
