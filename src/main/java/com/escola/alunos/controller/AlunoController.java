@@ -13,12 +13,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.escola.alunos.model.Aluno;
 import com.escola.alunos.repository.AlunoRepository;
+import com.escola.alunos.service.GeolocalizacaoService;
 
 @Controller
 public class AlunoController {
 
 	@Autowired
 	private AlunoRepository repository;
+	
+	@Autowired
+	private GeolocalizacaoService service;
 
 	// Vai para a tela de cadastro
 	@GetMapping("/aluno/cadastrar")
@@ -57,7 +61,14 @@ public class AlunoController {
 
 	@PostMapping("/aluno/salvar")
 	public String salvar(@ModelAttribute Aluno aluno) {
-		repository.salvar(aluno);
+		try {
+			List<Double> lagitudeLong = service.obterLagitudeLong(aluno.getContato());
+			aluno.getContato().setCoordinates(lagitudeLong);
+			repository.salvar(aluno);
+		} catch (Exception e) {
+			System.out.println("Endereço não localizado");
+			e.printStackTrace();
+		}
 		return "redirect:/";
 	}
 }

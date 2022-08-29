@@ -23,6 +23,7 @@ public class Aluno {
 	private List<Nota> notas;
 	private Curso curso;
 	private List<Habilidade> habilidades;
+	private Contato contato;
 	
 	public Aluno criarId() {
 		setId(new ObjectId());
