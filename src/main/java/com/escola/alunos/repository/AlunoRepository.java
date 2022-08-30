@@ -19,6 +19,9 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.geojson.Point;
+import com.mongodb.client.model.geojson.Position;
 
 @Repository
 public class AlunoRepository {
@@ -93,6 +96,28 @@ public class AlunoRepository {
 		}else if(classificacao.equals("aprovados")) {
 			resultados = alunoCollection.find(Filters.gte("notas",nota)).iterator();
 		}
+		
+		List<Aluno> alunos = popularAlunos(resultados);
+		
+		fecharConexao();
+		
+		return alunos;
+	}
+	
+	public List<Aluno> pesquisarPorGeolocalizacao(Aluno aluno) {
+		criarCodec();
+		
+		MongoCollection<Aluno> alunoCollection = this.bancoDeDados.getCollection("alunos", Aluno.class);
+		
+		alunoCollection.createIndex(Indexes.geo2dsphere("contato"));
+		
+		List<Double> coordinates = aluno.getContato().getCoordinates();
+		Point point = new Point(new Position(coordinates.get(0), coordinates.get(1)));
+		
+		//buscando os alunos que estão mais proximos, skip 1 para n pegar o mesmo aluno
+		MongoCursor<Aluno> resultados = alunoCollection.find(
+				Filters.nearSphere("contato", point, 2000.0, 0.0))
+				.limit(2).skip(1).iterator();
 		
 		List<Aluno> alunos = popularAlunos(resultados);
 		
